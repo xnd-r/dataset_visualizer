@@ -407,10 +407,10 @@ def main():
 				key = cv. waitKey(10)
 
 				if L:
-					ux = max(0, x_-w//4)
-					uy = max(0, y_-h//4)
-					lx = min(w, x_+w//4)
-					ly = min(h, y_+h//4)
+					ux = max(0, x_-w//2)
+					uy = max(0, y_-h//2)
+					lx = min(w, x_+w//2)
+					ly = min(h, y_+h//2)
 					skip = 0
 					break;
 				# d == next
