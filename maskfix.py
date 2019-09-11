@@ -14,20 +14,20 @@ zoom = 0
 x_, y_ = 0, 0  # curent mouse coords
 ux, uy = 0, 0  # current window pose
 L , R  = 0, 0  # current button state
-scale = 1
+scale = 0.8
 D , C = 0, 0
 T = 0
 old_path = '/home/moley/Desktop/chesnut_mushroom_risotto/'
 width = 1920
 heigh = 1080
 
-name_list = ['container-empty',\
-			 'container-busy',\
-			 'pot_medium_ruffoni',\
-			 'pot_medium_ruffoni_handle',\
-			 'ingredient',\
-			 'hand',\
-			 'hand_2',\
+object_list = ['container-empty',
+			 'container-busy',
+			 'pot_medium_ruffoni',
+			 'pot_medium_ruffoni_handle',
+			 'ingredient',
+			 'hand',
+			 'hand_2',
 			 'spatula']
 
 def mouse(event, x, y, flags, param):
@@ -71,10 +71,10 @@ def choose(root):
 		for i in range(2,len(root)):
 			object_ = "ingredient"
 			if root[i][0].text != object_ and \
-				int(root[i][1][0].text) <= x_ and \
-				int(root[i][1][1].text) >= x_ and \
-				int(root[i][1][2].text) <= y_ and \
-				int(root[i][1][3].text) >= y_:
+			int(root[i][1][0].text) <= x_ and \
+			int(root[i][1][1].text) >= x_ and \
+			int(root[i][1][2].text) <= y_ and \
+			int(root[i][1][3].text) >= y_:
 				obj_ind = i-2
 				print(root[i][0].text)
 	key = cv.waitKey(1)
@@ -169,14 +169,14 @@ def main():
 	# 0 - edit 
 	# 1 - delete
 	# 2 - add (have additional argument "object_name")
-
+	# 3 - change object name
 
 	if len(argv) > 1:
 		for i in range(1,len(argv)):
 			if argv[i] == '-i' and len(argv)>i+1:
 				start_index = (int)(argv[i+1])
 			if argv[i] == '-n' and len(argv)>i+1:
-				object_name      = argv[i+1]
+				object_name = argv[i+1]
 
 	cv.namedWindow(name)
 
@@ -201,6 +201,7 @@ def main():
 		cv.imshow(name,frame)
 		cv.setMouseCallback(name, mouse)
 		object_index = -1
+
 		if   action == 0: # edit ---------------------------------------
 			key = 0
 			zoom = 0
@@ -400,10 +401,10 @@ def main():
 				key = cv. waitKey(10)
 
 				if L:
-					ux = max(0, x_-w//4)
-					uy = max(0, y_-h//4)
-					lx = min(w, x_+w//4)
-					ly = min(h, y_+h//4)
+					ux = max(0, x_-w//2)
+					uy = max(0, y_-h//2)
+					lx = min(w, x_+w//2)
+					ly = min(h, y_+h//2)
 					skip = 0
 					break;
 				# d == next
@@ -429,14 +430,14 @@ def main():
 					break
 				if key == ord('n'):
 					menu = frame.copy()
-					for i in range(len(name_list)):
-						cv.putText(menu, '%d %s'%(i, name_list[i]) , (30,30*i), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 1)
+					for i in range(len(object_list)):
+						cv.putText(menu, '%d %s'%(i, object_list[i]) , (30,30*i), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 1)
 					cv.imshow(name, menu)
 					key_ = 0
 					while key_!=ord('e'):
 						key_ = cv.waitKey(0)
 						if (key_>=ord('0') and key_<=ord('9')):
-							object_name = name_list[int(chr(key_))]
+							object_name = object_list[int(chr(key_))]
 							break
 					break
 
