@@ -440,7 +440,7 @@ def main():
 				if key == ord('n'):
 					menu = frame.copy()
 					for i in range(len(name_list)):
-						cv.putText(menu, '%d %s'%(i, name_list[i]) , (30,30*i), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 1)
+						cv.putText(menu, '%d %s'%(i, name_list[i]) , (30,90 + 30*i), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 1)
 					cv.imshow(name, menu)
 					key_ = 0
 					while key_!=ord('e'):
