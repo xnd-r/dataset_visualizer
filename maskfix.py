@@ -17,6 +17,8 @@ L , R  = 0, 0  # current button state
 scale = 0.8
 D , C = 0, 0
 T = 0
+I = 0
+object_ = "ingredient" # 
 old_path = '/home/moley/Desktop/chesnut_mushroom_risotto/'
 width = 1920
 heigh = 1080
@@ -62,19 +64,16 @@ def mouse(event, x, y, flags, param):
 	# print(flags)
 
 def choose(root):
-	global x_
-	global y_
-	global L
-	global T
+	global x_, y_
+	global L, T, I, object_
 	obj_ind = -1
 	if L != 0 or T != 0:
 		for i in range(2,len(root)):
-			object_ = "ingredient"
-			if root[i][0].text != object_ and \
-			int(root[i][1][0].text) <= x_ and \
-			int(root[i][1][1].text) >= x_ and \
-			int(root[i][1][2].text) <= y_ and \
-			int(root[i][1][3].text) >= y_:
+			if ((root[i][0].text != object_) - I) and \
+				int(root[i][1][0].text) <= x_ and \
+				int(root[i][1][1].text) >= x_ and \
+				int(root[i][1][2].text) <= y_ and \
+				int(root[i][1][3].text) >= y_:
 				obj_ind = i-2
 				print(root[i][0].text)
 	key = cv.waitKey(1)
@@ -138,11 +137,10 @@ def add_object(root, object_name):
 	tmp2.text = '0'
 
 def drawbb(img, root):
+	global I, object_
 	draw = img.copy()
 	for i in range(2,len(root)):
-		# if 1:
-		# if (root[i][0].text == "container-busy" or root[i][0].text == "container-empty"):
-		if root[i][0].text != "ingredient":
+		if ((root[i][0].text != object_) - I):
 			cv.line(draw, (int(root[i][1][0].text),int(root[i][1][2].text)), (int(root[i][1][1].text),int(root[i][1][2].text)), (0,255,0), 1)
 			cv.line(draw, (int(root[i][1][1].text),int(root[i][1][2].text)), (int(root[i][1][1].text),int(root[i][1][3].text)), (0,255,0), 1)
 			cv.line(draw, (int(root[i][1][1].text),int(root[i][1][3].text)), (int(root[i][1][0].text),int(root[i][1][3].text)), (0,255,0), 1)
@@ -152,12 +150,9 @@ def drawbb(img, root):
 
 
 def main():
-	global x_
-	global y_
-	global ux
-	global uy
-	global L, T
-	global D, C
+	global x_, y_
+	global ux, uy
+	global L, T, D, C, I
 	global zoom
 	path = os.getcwd()
 	imglist = sorted(glob(path+'/*[0-9][0-9][0-9].png'))
@@ -217,6 +212,9 @@ def main():
 				if key == ord('d'):
 					img_index += 1
 					break
+				if key == ord('i'):
+					I = 1 - I
+					break
 				if key == ord('`'):
 					action = 0
 					break
@@ -237,7 +235,8 @@ def main():
 			if(object_index >= 0):
 				print(object_index, root[object_index+2][0].text, "\t", imglist[img_index][0:-4]+'_%d.png'%object_index)
 				mask = cv.imread(imglist[img_index][0:-4]+'_%d.png'%object_index)
-				
+				_, mask = cv.threshold(mask,127,255,cv.THRESH_BINARY)
+
 				ux = int((int(root[object_index+2][1][0].text)+int(root[object_index+2][1][1].text))/2)
 				uy = int((int(root[object_index+2][1][2].text)+int(root[object_index+2][1][3].text))/2)
 				d  = max(int(root[object_index+2][1][1].text)-int(root[object_index+2][1][0].text), int(root[object_index+2][1][3].text)-int(root[object_index+2][1][2].text))
@@ -318,6 +317,11 @@ def main():
 					elif key == ord('n'):  # create new mask
 						point_list = []
 						mask =  np.zeros((h,w,3), np.uint8)
+					# elif key == ord('b'):  # create new mask
+					# 	mask_ = np.zeros((h+2,w+2,3))
+					# 	mask_[1:-1,1:-1] = mask
+					# 	_1, _2, mask, _4	=	cv.floodFill(mask, mask_, (x_,y_), 255)
+
 					elif key == ord('s'):  # save mask 
 						mask = cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
 						cv.imwrite(imglist[img_index][0:-4]+'_%d.png' % object_index, mask)
@@ -379,6 +383,9 @@ def main():
 				if key == ord('3'):
 					action = 3
 					break
+				if key == ord('i'):
+					I = 1 - I
+					break
 				if key == 27: #esc
 					exit()
 			sleep(0.2)
@@ -427,6 +434,9 @@ def main():
 					break
 				if key == ord('3'):
 					action = 3
+					break
+				if key == ord('i'):
+					I = 1 - I
 					break
 				if key == ord('n'):
 					menu = frame.copy()
@@ -589,6 +599,21 @@ def main():
 					break
 				if key == ord('3'):
 					action = 3
+					break
+				if key == ord('i'):
+					I = 1 - I
+					break
+				if key == ord('n'):
+					menu = frame.copy()
+					for i in range(len(name_list)):
+						cv.putText(menu, '%d %s'%(i, name_list[i]) , (30,30*i), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 1)
+					cv.imshow(name, menu)
+					key_ = 0
+					while key_!=ord('e'):
+						key_ = cv.waitKey(0)
+						if (key_>=ord('0') and key_<=ord('9')):
+							object_name = name_list[int(chr(key_))]
+							break
 					break
 				if key == 27: #esc
 					exit()
